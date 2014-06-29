@@ -2,7 +2,7 @@
 
 void Main()
 {
-	var baseDir = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
 
 	var addresses = MyExtensions.ReadCSV(Path.Combine(baseDir, "Address.csv"))
 	;

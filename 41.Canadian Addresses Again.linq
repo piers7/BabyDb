@@ -1,20 +1,19 @@
 <Query Kind="Program" />
 
-static string dataDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
-
 void Main()
 {
-	GetCanadianAddressesAgain().Dump();
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
+	GetCanadianAddressesAgain(baseDir).Dump();
 }
 
-public static IEnumerable<object> GetCanadianAddressesAgain(){
+public static IEnumerable<object> GetCanadianAddressesAgain(string baseDir){
 
-	var stateProvince = MyExtensions.ReadCSV(Path.Combine(dataDir, "StateProvince.csv"))
+	var stateProvince = MyExtensions.ReadCSV(Path.Combine(baseDir, "StateProvince.csv"))
 		.Where (state => state.CountryRegionCode == "CA")
 	;
 
 	foreach(var state in stateProvince){		
-		var matchingAddresses = ReadCSVFromIndex(dataDir, "Address.csv", "StateProvinceID", state.StateProvinceID);
+		var matchingAddresses = ReadCSVFromIndex(baseDir, "Address.csv", "StateProvinceID", state.StateProvinceID);
 		foreach(var address in matchingAddresses)
 			yield return new { address.AddressLine1, address.City, StateName = state.Name };
 	}

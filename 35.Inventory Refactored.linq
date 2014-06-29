@@ -6,13 +6,15 @@ void Main()
 	// Maybe we know both tables are laid out the same way?
 	// Can't we just scan though both at the same time?
 	
-	var baseDir = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
 	var products = MyExtensions.ReadCSV(Path.Combine(baseDir, "Product.csv"));
 	var productInventory = MyExtensions.ReadCSV(Path.Combine(baseDir, "ProductInventory.csv"));
 
 	ShowProductsAndInventory(
 		products, 
 		productInventory,
+		p => p.ProductID,
+		i => i.ProductID,
 		(product,inventory) => new { 
 			product.ProductID,
 			product.Name,
@@ -24,29 +26,31 @@ void Main()
 	).Dump();
 }
 
-private IEnumerable<dynamic> ShowProductsAndInventory(
-	IEnumerable<dynamic> products,
-	IEnumerable<dynamic> inventory,
-	Func<dynamic, dynamic, dynamic> resultSelector
+private IEnumerable<TResult> ShowProductsAndInventory<TLeft,TRight,TResult>(
+	IEnumerable<TLeft> left,
+	IEnumerable<TRight> right,
+	Func<TLeft,int> leftKeySelector,
+	Func<TRight,int> rightKeySelector,
+	Func<TLeft, TRight, TResult> resultSelector
 ){
 	// assumes both inputs sorted by ProductID
-	var inventoryIterator = inventory.GetEnumerator();
-	if(!inventoryIterator.MoveNext())
+	var rightIterator = right.GetEnumerator();
+	if(!rightIterator.MoveNext())
 		yield break;
-	var currentInventory = inventoryIterator.Current;
+	var rightItem = rightIterator.Current;
 	
-	foreach(var product in products){
-		var productID = product.ProductID;
+	foreach(var leftItem in left){
+		var key = leftKeySelector(leftItem);
 
-		// this next bit only works because we coverted the IDs to ints
-		while(currentInventory.ProductID <= productID){
-			if(currentInventory.ProductID == productID){
-				yield return resultSelector(product, currentInventory);
+		// ok, so this still needs integer keys just now
+		while(rightKeySelector(rightItem) <= key){
+			if(rightKeySelector(rightItem) == key){
+				yield return resultSelector(leftItem, rightItem);
 			}
 			
-			if(!inventoryIterator.MoveNext())
+			if(!rightIterator.MoveNext())
 				yield break;
-			currentInventory = inventoryIterator.Current;
+			rightItem = rightIterator.Current;
 		}
 	}
 }

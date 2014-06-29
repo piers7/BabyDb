@@ -6,9 +6,9 @@ void Main()
 	// Maybe we know both tables are laid out the same way?
 	// Can't we just scan though both at the same time?
 	
-	var basePath = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
-	var products = MyExtensions.ReadCSV(Path.Combine(basePath, "Product.csv"));
-	var inventory = MyExtensions.ReadCSV(Path.Combine(basePath, "ProductInventory.csv"));
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
+	var products = MyExtensions.ReadCSV(Path.Combine(baseDir, "Product.csv"));
+	var inventory = MyExtensions.ReadCSV(Path.Combine(baseDir, "ProductInventory.csv"));
 
 	ShowProductsAndInventory(products, inventory).Dump();
 }

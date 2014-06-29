@@ -2,15 +2,22 @@
 
 void Main()
 {
-	var baseDir = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
+
+	var addresses = MyExtensions.ReadCSV(Path.Combine(baseDir, "Address.csv"));
+	var stateProvince = MyExtensions.ReadCSV(Path.Combine(baseDir, "StateProvince.csv"));
 	
-	GetCanadianAddresses(baseDir).Dump();
+	addresses.Take(10).Dump();
+	stateProvince.Dump();
+	
+	
+	//GetCanadianAddresses(baseDir).Dump();
 }
 
-public static IEnumerable<object> GetCanadianAddresses(string basePath){
-	var addresses = MyExtensions.ReadCSV(Path.Combine(basePath, "Address.csv"));
-	var stateProvince = MyExtensions.ReadCSV(Path.Combine(basePath, "StateProvince.csv"));
+public static IEnumerable<object> GetCanadianAddresses(string baseDir){
+	var addresses = MyExtensions.ReadCSV(Path.Combine(baseDir, "Address.csv"));
+	var stateProvince = MyExtensions.ReadCSV(Path.Combine(baseDir, "StateProvince.csv"));
 	
 	// How do we get all the addresses in Canada?
-
+	throw new NotImplementedException();
 }

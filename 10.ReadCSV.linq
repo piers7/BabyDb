@@ -2,8 +2,8 @@
 
 void Main()
 {
-	var basePath = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
-	var people = ReadCSV(Path.Combine(basePath, "Person.csv"), "+|");
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
+	var people = ReadCSV(Path.Combine(baseDir, "Person.csv"), "+|");
 
 	people
 		.Take(100)
@@ -17,10 +17,8 @@ public static IEnumerable<dynamic> ReadCSV(string path, string delimiter = "\t")
 
 	// Now read in the body, and line by line
 	// map the columns to properties on a dynamic object based on the header names
-	var rows = File.ReadLines(path)
-		.Select (line => line.Split(new[]{delimiter}, StringSplitOptions.None));
-
-	foreach(var rowData in rows){
+	foreach(var line in File.ReadLines(path)){
+		var rowData = line.Split(new[]{delimiter}, StringSplitOptions.None);
 		var output = (IDictionary<string,object>)new System.Dynamic.ExpandoObject();
 		for (var i = 0; i < header.Length; i++)
 		{

@@ -2,22 +2,26 @@
 
 void Main()
 {
-	var baseDir = @"C:\Users\Piers\Downloads\AdventureWorks 2012 OLTP Script";
+	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
 	
 	GetCanadianAddresses(baseDir).Dump();
 }
 
-public static IEnumerable<object> GetCanadianAddresses(string basePath){
-	var addresses = MyExtensions.ReadCSV(Path.Combine(basePath, "Address.csv"));
-	var stateProvince = MyExtensions.ReadCSV(Path.Combine(basePath, "StateProvince.csv"));
+public static IEnumerable<object> GetCanadianAddresses(string baseDir){
+	var addresses = MyExtensions.ReadCSV(Path.Combine(baseDir, "Address.csv"));
+	var stateProvince = MyExtensions.ReadCSV(Path.Combine(baseDir, "StateProvince.csv"));
 	
 	// How do we get all the addresses in Canada?
+	
+	// First, pull all the Canadian states into a hashtable (eg Dictionary)
+	// Q: what is the difference between a hashtable and a Dictionary<T,T1>?
 	var canadianStates = new Dictionary<int,object>();
 	foreach(var state in stateProvince){
 		if(state.CountryRegionCode == "CA")
 			canadianStates.Add(state.StateProvinceID, state);
 	}
 	
+	// Then pull all the addresses, filter based on the hashtable, return the matches
 	var canadianAddresses = new List<object>();
 	foreach(var address in addresses){
 		dynamic state;
