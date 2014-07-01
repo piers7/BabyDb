@@ -2,10 +2,6 @@
 
 void Main()
 {
-	// Back to Canada
-	// Scanning the whole Addresses table still seems inefficient
-	// What if we had a magic way of locating Addresses by StateProvinceID?
-	
 	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
 	GetCanadianAddressesAgain(baseDir).Dump();
 }
@@ -16,11 +12,13 @@ public static IEnumerable<object> GetCanadianAddressesAgain(string baseDir){
 		.Where (state => state.CountryRegionCode == "CA")
 	;
 
-	throw new NotImplementedException();
+	foreach(var state in stateProvince){		
+		var matchingAddresses = ReadCSVFromIndex(baseDir, "Address.csv", "StateProvinceID", state.StateProvinceID);
+		foreach(var address in matchingAddresses)
+			yield return new { address.AddressLine1, address.City, StateName = state.Name };
+	}
 }
 
-#region spoilers
-/*
 public static IEnumerable<dynamic> ReadCSVFromIndex(
 	string baseDir,
 	string csvName,
@@ -32,5 +30,3 @@ public static IEnumerable<dynamic> ReadCSVFromIndex(
 	//Console.WriteLine("Read from index {0}", indexPath);
 	return MyExtensions.ReadCSV(indexPath, headerPath:headerPath);
 }
-*/
-#endregion
