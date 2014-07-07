@@ -12,11 +12,19 @@ public static IEnumerable<object> GetCanadianAddressesAgain(string baseDir){
 		.Where (state => state.CountryRegionCode == "CA")
 	;
 
+	// Loop through the StateProvince table (the small one)
 	foreach(var state in stateProvince){		
+		// and for each row, spool the matching rows from Addresses (the big table)
+		// via the appropriate index
 		var matchingAddresses = ReadCSVFromIndex(baseDir, "Address.csv", "StateProvinceID", state.StateProvinceID);
 		foreach(var address in matchingAddresses)
 			yield return new { address.AddressLine1, address.City, StateName = state.Name };
 	}
+	
+	// This is Nested Loops:
+	// for each row in one table
+	//  for each row in other table (or more likely, index portion)
+	//   return output
 }
 
 public static IEnumerable<dynamic> ReadCSVFromIndex(

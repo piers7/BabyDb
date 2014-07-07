@@ -2,6 +2,9 @@
 
 void Main()
 {
+	// Yeah, ok, I was suspicious too
+	// So I put this together to be sure I did actually have it working
+	
 	var left = new[]{ 1,2,4,5,7,10 };
 	var right = new[]{ 2,3,4,7,8,10 };
 	

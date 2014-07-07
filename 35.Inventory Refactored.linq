@@ -10,7 +10,11 @@ void Main()
 	var products = MyExtensions.ReadCSV(Path.Combine(baseDir, "Product.csv"));
 	var productInventory = MyExtensions.ReadCSV(Path.Combine(baseDir, "ProductInventory.csv"));
 
-	ShowProductsAndInventory(
+	// So the signature is the same as before,
+	// but the implementation is different.
+	// It's a pity I can't express the ordering requirement nicely
+	// (IOrderedEnumerable seems to really be IOrderableEnumerable) 
+	MergeJoin(
 		products, 
 		productInventory,
 		p => p.ProductID,
@@ -26,7 +30,7 @@ void Main()
 	).Dump();
 }
 
-private IEnumerable<TResult> ShowProductsAndInventory<TLeft,TRight,TResult>(
+private IEnumerable<TResult> MergeJoin<TLeft,TRight,TResult>(
 	IEnumerable<TLeft> left,
 	IEnumerable<TRight> right,
 	Func<TLeft,int> leftKeySelector,

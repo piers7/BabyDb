@@ -2,17 +2,19 @@
 
 void Main()
 {
-	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
-	var people = ReadCSV(Path.Combine(baseDir, "Person.csv"), "+|");
+	var dataDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
+	var people = ReadCSV(Path.Combine(dataDir, "Person.csv"), "+|");
 
 	people
 		.Take(100)
 		.Dump();
 }
 
-public static IEnumerable<dynamic> ReadCSV(string path, string delimiter = "\t"){
+public static IEnumerable<dynamic> ReadCSV(string path, string delimiter = "\t", string headerPath = null){
+	if(headerPath==null)
+		headerPath = Path.ChangeExtension(path, ".header");
+
 	// First, read in the header info
-	var headerPath = Path.ChangeExtension(path, ".header");
 	var header = File.ReadAllLines(headerPath);
 
 	// Now read in the body, and line by line
@@ -24,8 +26,15 @@ public static IEnumerable<dynamic> ReadCSV(string path, string delimiter = "\t")
 		{
 			var columnName = header[i];
 			var columnValue = rowData[i];
-			output[columnName] = columnValue;
+			if(columnName.EndsWith("ID"))
+				// hack to make ID columns numeric (ints)
+				// is neccesary for Merge Joins to compare correctly
+				output[columnName] = columnValue == "" ? (int?)null : Convert.ToInt32(columnValue);
+			else
+				// other than the above, everything else is just a string
+				output[columnName] = columnValue;
 		}
+		output["__rawLine"] = line;
 		yield return output;
 	}
 }

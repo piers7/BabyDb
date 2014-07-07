@@ -9,8 +9,10 @@ void Main()
 	var stateProvince = MyExtensions.ReadCSV(Path.Combine(baseDir, "StateProvince.csv"))
 		.Where (a => a.CountryRegionCode == "CA")
 	;
-	
-	GetCanadianAddresses(
+
+	// This is what the generalized version looks like
+	// ...and yes, this bears a striking resemblance to Enumerable.Join
+	MergeJoin(
 		stateProvince, 
 		addresses,
 		inner => inner.StateProvinceID,
@@ -18,9 +20,14 @@ void Main()
 		(inner,outer) => new { outer.AddressLine1, outer.City, StateName = inner.Name}
 	)
 	.Dump();
+	
+	// Hash joins are a great default strategy, 
+	// because you don't need to know *anything* about the data, except some way to derive a common key.
+	// So they always work
+	// (sample implementation here is constrained by virtual memory)
 }
 
-public static IEnumerable<object> GetCanadianAddresses<TKey>(
+public static IEnumerable<object> MergeJoin<TKey>(
 	IEnumerable<dynamic> inner, 
 	IEnumerable<dynamic> outer,
 	Func<dynamic, TKey> innerKeySelector,

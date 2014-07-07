@@ -2,6 +2,8 @@
 
 void Main()
 {
+	// This is just setup for the next bit
+	
 	var baseDir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "Data");
 	
 	CreateIndexes(baseDir, "Address.csv", row => row.StateProvinceID, "StateProvinceID");

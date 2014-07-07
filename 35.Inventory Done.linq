@@ -17,7 +17,7 @@ private IEnumerable<dynamic> ShowProductsAndInventory(
 	IEnumerable<dynamic> products,
 	IEnumerable<dynamic> inventory
 ){
-	// assumes both inputs sorted by ProductID
+	// Assumes (requires) that both inputs are sorted by ProductID
 	var inventoryIterator = inventory.GetEnumerator();
 	if(!inventoryIterator.MoveNext())
 		yield break;
@@ -26,7 +26,9 @@ private IEnumerable<dynamic> ShowProductsAndInventory(
 	foreach(var product in products){
 		var productID = product.ProductID;
 
-		// this next bit only works because we coverted the IDs to ints
+		// NB: this next bit only works because we coverted the IDs to ints
+		// It'd work with strings too, but only if the files were in text-sort ID order (which they're not)
+		// This just highlights how sort-order sensitive this approach is
 		while(currentInventory.ProductID <= productID){
 			if(currentInventory.ProductID == productID){
 				yield return new { 

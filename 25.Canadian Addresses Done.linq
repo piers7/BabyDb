@@ -14,14 +14,14 @@ public static IEnumerable<object> GetCanadianAddresses(string baseDir){
 	// How do we get all the addresses in Canada?
 	
 	// First, pull all the Canadian states into a hashtable (eg Dictionary)
-	// Q: what is the difference between a hashtable and a Dictionary<T,T1>?
 	var canadianStates = new Dictionary<int,object>();
 	foreach(var state in stateProvince){
 		if(state.CountryRegionCode == "CA")
 			canadianStates.Add(state.StateProvinceID, state);
 	}
 	
-	// Then pull all the addresses, filter based on the hashtable, return the matches
+	// Then loop through all the addresses
+	// and return those that have a StateProvinceID that matches one of the states we cached above
 	var canadianAddresses = new List<object>();
 	foreach(var address in addresses){
 		dynamic state;
@@ -29,4 +29,12 @@ public static IEnumerable<object> GetCanadianAddresses(string baseDir){
 			yield return new { address.AddressLine1, address.City, StateName = state.Name };
 		}
 	}
+	
+	// This is a hash join.
+	
+	// It has three parts:
+	// - building the index on one of the sequences, based on some key in the sequence
+	// - enumerating the other sequence, probing the index based on a key in *that* sequence that should match
+	// - projecting some kind of result sequence
+	// So we can generalize the above.
 }
